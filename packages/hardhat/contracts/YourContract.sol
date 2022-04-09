@@ -1,46 +1,69 @@
-pragma solidity >=0.8.0 <0.9.0;
-//SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.4;
 
-import "hardhat/console.sol";
-
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20FlashMint.sol";
 
-contract YourContract {
-    event SetPurpose(address sender, string purpose);
-    event SetMasterPurpose(address sender, string masterPurpose);
+contract SyndicateSilver is
+    ERC20,
+    ERC20Burnable,
+    Pausable,
+    Ownable,
+    ERC20Permit,
+    ERC20Votes,
+    ERC20FlashMint
+{
+    constructor()
+        ERC20("Syndicate Silver", "SSC")
+        ERC20Permit("Syndicate Silver")
+    {}
 
-    string public purpose = "Started Finally!";
-    string public masterPurpose = "Only " "MASTER OWNER" " can change !";
-
-    constructor() payable {
-        // what should we do on deploy?
+    function pause() public onlyOwner {
+        _pause();
     }
 
-    uint256 public writePrice = 0.01 ether;
-    address public owner = 0x69C784748bA48614F063030d2184149178A74BbF;
-
-    function setPurpose(string memory newPurpose) public payable {
-        purpose = newPurpose;
-        console.log(msg.sender, "set purpose to", purpose);
-        require(msg.value >= writePrice, "Not enought ether");
-        emit SetPurpose(msg.sender, purpose);
+    function unpause() public onlyOwner {
+        _unpause();
     }
 
-    function setMasterPurpose(string memory newMasterPurpose) public payable {
-        require(msg.sender == owner, "Not the owner");
-        masterPurpose = newMasterPurpose;
-
-        emit SetMasterPurpose(msg.sender, masterPurpose);
+    function mint(address to, uint256 amount) public onlyOwner {
+        _mint(to, amount);
     }
 
-    function withdraw() public payable {
-        require(msg.sender == owner, "Not the owner, you pice of shit");
-        (bool success, ) = owner.call{value: address(this).balance}("");
-        require(success, "Failed to withdraw");
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 amount
+    ) internal override whenNotPaused {
+        super._beforeTokenTransfer(from, to, amount);
     }
 
-    // to support receiving ETH by default
-    receive() external payable {}
+    // The following functions are overrides required by Solidity.
 
-    fallback() external payable {}
+    function _afterTokenTransfer(
+        address from,
+        address to,
+        uint256 amount
+    ) internal override(ERC20, ERC20Votes) {
+        super._afterTokenTransfer(from, to, amount);
+    }
+
+    function _mint(address to, uint256 amount)
+        internal
+        override(ERC20, ERC20Votes)
+    {
+        super._mint(to, amount);
+    }
+
+    function _burn(address account, uint256 amount)
+        internal
+        override(ERC20, ERC20Votes)
+    {
+        super._burn(account, amount);
+    }
 }
