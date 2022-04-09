@@ -6,7 +6,6 @@ import { SyncOutlined } from "@ant-design/icons";
 import { Address, Balance, Events } from "../components";
 
 export default function ExampleUI({
-  masterPurpose,
   purpose,
   address,
   mainnetProvider,
@@ -25,9 +24,8 @@ export default function ExampleUI({
         ⚙️ Here is an example UI that displays and sets the purpose in your smart contract:
       */}
       <div style={{ border: "1px solid #cccccc", padding: 16, width: 400, margin: "auto", marginTop: 64 }}>
-        <h2>Example UI:</h2>
+        <h2>Mock UI:</h2>
         <h4>purpose: {purpose}</h4>
-        <h4>Master Purpose: {masterPurpose}</h4>
         <Divider />
         <div style={{ margin: 8 }}>
           <Input
@@ -63,18 +61,34 @@ export default function ExampleUI({
           </Button>
         </div>
         <Divider />
-        Your Address:
-        <Address address={address} ensProvider={mainnetProvider} fontSize={16} />
+        {/* Your Address:
+        <Address address={address} ensProvider={mainnetProvider} fontSize={16} /> */}
         <Divider />
-
+        {/* ENS Address Example: */}
+        {/* <Address */}
+        {/* address="0x34aA3F359A9D614239015126635CE7732c18fDF3" /* this will show as austingriffith.eth */}
+        {/* ensProvider={mainnetProvider} */}
+        {/* fontSize={16} */}
+        {/* /> */}
         <Divider />
         {/* use utils.formatEther to display a BigNumber: */}
         <h2>Your Balance: {yourLocalBalance ? utils.formatEther(yourLocalBalance) : "..."}</h2>
         <div>OR</div>
         <Balance address={address} provider={localProvider} price={price} />
         <Divider />
+        <div>🐳 Example Whale Balance:</div>
         <Balance balance={utils.parseEther("1000")} provider={localProvider} price={price} />
-
+        <Divider />
+        {/* use utils.formatEther to display a BigNumber: */}
+        <h2>Your Balance: {yourLocalBalance ? utils.formatEther(yourLocalBalance) : "..."}</h2>
+        <Divider />
+        Your Contract Address:
+        <Address
+          address={readContracts && readContracts.SyndicateSilver ? readContracts.SyndicateSilver.address : null}
+          ensProvider={mainnetProvider}
+          fontSize={16}
+        />
+        <Divider />
         <div style={{ margin: 8 }}>
           <Button
             onClick={() => {
@@ -83,16 +97,6 @@ export default function ExampleUI({
             }}
           >
             Set Purpose to &quot;🍻 Cheers&quot;
-          </Button>
-        </div>
-        <div style={{ margin: 8 }}>
-          <Button
-            onClick={() => {
-              /* look how you call setPurpose on your contract: */
-              tx(writeContracts.YourContract.setMasterPurpose("🔥 Burn the ⛓"));
-            }}
-          >
-            Set Master Purpose to &quot;🔥 Burn the ⛓&quot;
           </Button>
         </div>
         <div style={{ margin: 8 }}>
